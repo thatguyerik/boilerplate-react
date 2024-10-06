@@ -1,0 +1,29 @@
+services:
+
+  cli:
+    image: ${COMPOSE_PROJECT_NAME_SAFE}/cli
+    build: services/cli
+    ports:
+      - "3000:3000"
+    labels:
+      - io.docksal.virtual-host=${VIRTUAL_HOST}
+      - io.docksal.virtual-port=3000
+    volumes:
+      - project_root:/var/www:rw,nocopy,cached
+      - docksal_ssh_agent:/.ssh-agent:ro
+    command: ["bash", "-lc", "npm run start"]
+
+  storybook:
+    depends_on:
+      - cli
+    image: ${COMPOSE_PROJECT_NAME_SAFE}/cli
+    build: services/cli
+    ports:
+      - "6006:6006"
+    labels:
+      - io.docksal.virtual-host=storybook.${VIRTUAL_HOST}
+      - io.docksal.virtual-port=6006
+    volumes:
+      - project_root:/var/www:rw,nocopy,cached
+      - docksal_ssh_agent:/.ssh-agent:ro
+    command: ["bash", "-lc", "npm run storybook"]
